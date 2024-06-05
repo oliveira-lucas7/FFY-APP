@@ -39,8 +39,8 @@ export default function Home() {
     React.useCallback(() => {
       fade.setValue(0);
       Animated.timing(fade, {
-        toValue: 1,
-        duration: 1000,
+        toValue: 10,
+        duration: 3000,
         useNativeDriver: true,
       }).start();
     }, [fade])

@@ -13,7 +13,7 @@ export default function BuscaUsuario() {
     const [userSenha, setUserSenha] = useState();
 
     async function getUsuarios() {
-        await fetch('https://10.139.75.10/api/Usuario/GetUsuarioId/{id}', {
+        await fetch('http://10.139.75.10:5251/api/Usuario/GetAllUsuario', {
             method: 'GET',
             headers: {
                 'content-type': 'application/json'
@@ -29,7 +29,7 @@ export default function BuscaUsuario() {
     }, [])
 
     useEffect(() => {
-        setFiltro(usuario.filter((item) => item.name.firstname == busca)[0])
+        setFiltro(usuario.filter((item) => item.usuarioNome == busca)[0])
     }, [busca])
 
     return (
@@ -58,15 +58,15 @@ export default function BuscaUsuario() {
                     <MaterialCommunityIcons name="account" size={28} color="white" style={styles.icon} />
                         <Text style={styles.cardText}>
                         <MaterialCommunityIcons name="pencil" size={16} color="white" style={styles.icon} />
-                            Nome: {filtro.name.firstname} {filtro.name.lastname}
+                            Nome: {filtro.usuarioNome}
                         </Text>
                         <Text style={styles.cardText}>
                         <MaterialCommunityIcons name="email" size={16} color="white" style={styles.icon} />
-                            E-mail: {filtro.email}
+                            E-mail: {filtro.usuarioEmail}
                         </Text>
                         <Text style={styles.cardText}>
                             <MaterialCommunityIcons name="phone" size={16} color="white" style={styles.icon} />
-                            Telefone: {filtro.phone}
+                            Telefone: {filtro.usuarioTelefone}
                         </Text>
                     </View>
                 </View>

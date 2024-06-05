@@ -5,11 +5,11 @@ import { View, Text } from 'react-native'
 import React, { useContext } from 'react'
 
 import Home from '../Pages/Home';
-import Search from '../Pages/AllUsuarios';
+import AdicionarObjetos from '../Pages/AdicionarObjeto';
 import Login from '../Pages/Login';
 import Inserir from '../Pages/InserirUsuario';
 import Perfil from '../Pages/Perfil';
-import Videos from '../Pages/Videos';
+import BuscaUsuario from '../Pages/BuscaUsuario';
 import { AuthContext } from '../Context/AuthContext';
 
 const Tab = createBottomTabNavigator();
@@ -46,8 +46,8 @@ export default function Rotas()
             }}
             />
             <Tab.Screen
-            name="Search"
-            component={Search}
+            name="AdicionarObjetos"
+            component={AdicionarObjetos}
             options={{
                 tabBarLabel: () => null,
                 tabBarIcon: ({ color, size }) => (
@@ -77,8 +77,8 @@ export default function Rotas()
             }}
           />
           <Tab.Screen
-            name="Videos"
-            component={Videos}
+            name="BuscaUsuario"
+            component={BuscaUsuario}
             options={{
                 tabBarLabel: () => null,
                 tabBarIcon: ({ color, size }) => (

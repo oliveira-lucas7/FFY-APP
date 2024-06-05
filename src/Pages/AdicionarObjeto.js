@@ -1,28 +1,37 @@
 import React, { useState } from 'react';
 import { TouchableOpacity, Alert } from 'react-native';
 import { View, Text, ScrollView, TextInput, StyleSheet, Image } from 'react-native';
+import Objetos from './Objetos';
 
-export default function InserirUsuario() {
+export default function AdicionarObjeto() {
 
   const [nome, setNome] = useState("");
-  const [telefone, setTelefone] = useState("");
-  const [email, setEmail] = useState("");
-  const [senha, setSenha] = useState("");
-  const [erro, setErro] = useState(false);
+  const [cor, setCor] = useState("");
+  const [observacao, setObservacao] = useState("");
+  const [local, setLocal] = useState("");
+  const [foto, setFoto] = useState("");
+  const [desaparecimento, setDesaparecimento] = useState("");
+  const [encontro, setEncontro] = useState("");
+  const [status, setStatus] = useState("")
   const [sucesso, setSucesso] = useState(false);
+  const [erro, setErro] = useState(false);
 
   async function Cadastro() {
     try {
-      const response = await fetch('http://10.139.75.10:5251/api/Usuario/CreateUsuario', {
+      const response = await fetch('http://10.139.75.10:5251/api/Objeto/CreateObjeto', {
         method: "POST",
         headers: {
           'Content-Type': 'application/json'
         },
         body: JSON.stringify({
-          UsuarioNome: nome,
-          UsuarioTelefone: telefone,
-          UsuarioEmail: email,
-          UsuarioSenha: senha,
+          ObjetoNome: nome,
+          ObjetoCor: cor,
+          ObjetoObservacao: observacao,
+          ObjetoLocalDesaparecimento: local,
+          ObjetoFoto: foto,
+          ObjetoDtDesaparecimento: desaparecimento,
+          ObjetoDtEncontro: encontro,
+          ObjetoStatus: status,
         })
       });
 
@@ -64,27 +73,27 @@ export default function InserirUsuario() {
                   onChangeText={(digitado) => setNome(digitado)}
                   value={nome}
                   inputMode='text'
-                  placeholder="Seu nome"
+                  placeholder="Objeto"
                   placeholderTextColor='white'
                 />
               </View>
               <View style={styles.inputContainer}>
                 <TextInput
                   style={styles.input}
-                  onChangeText={(digitado) => setEmail(digitado)}
-                  value={email}
+                  onChangeText={(digitado) => setCor(digitado)}
+                  value={cor}
                   inputMode='text'
-                  placeholder="Seu email"
+                  placeholder="Cor"
                   placeholderTextColor='white'
                 />
               </View>
               <View style={styles.inputContainer}>
                 <TextInput
                   style={styles.input}
-                  onChangeText={(digitado) => setSenha(digitado)}
-                  value={senha}
+                  onChangeText={(digitado) => setObservacao(digitado)}
+                  value={observacao}
                   inputMode='text'
-                  placeholder="Sua senha"
+                  placeholder="Observação"
                   placeholderTextColor='white'
                   secureTextEntry={true}
                 />
@@ -92,10 +101,51 @@ export default function InserirUsuario() {
               <View style={styles.inputContainer}>
                 <TextInput
                   style={styles.input}
-                  onChangeText={(digitado) => setTelefone(digitado)}
-                  value={telefone}
+                  onChangeText={(digitado) => setLocal(digitado)}
+                  value={local}
                   inputMode='text'
-                  placeholder="Seu telefone"
+                  placeholder="Local que perdeu"
+                  placeholderTextColor='white'
+                />
+              </View>
+              <View style={styles.inputContainer}>
+                <TextInput
+                  style={styles.input}
+                  onChangeText={(digitado) => setFoto(digitado)}
+                  value={foto}
+                  inputMode='text'
+                  placeholder="Url da imagem"
+                  placeholderTextColor='white'
+                />
+              </View>
+              <View style={styles.inputContainer}>
+                <TextInput
+                  style={styles.input}
+                  onChangeText={(digitado) => setDesaparecimento(digitado)}
+                  value={desaparecimento}
+                  inputMode='text'
+                  placeholder="Data de desaparecimento"
+                  placeholderTextColor='white'
+                />
+              </View>
+              <View style={styles.inputContainer}>
+                <TextInput
+                  style={styles.input}
+                  onChangeText={(digitado) => setEncontro(digitado)}
+                  value={encontro}
+                  inputMode='text'
+                  placeholder="Data de encontro"
+                  placeholderTextColor='white'
+                  secureTextEntry={true}
+                />
+              </View>
+              <View style={styles.inputContainer}>
+                <TextInput
+                  style={styles.input}
+                  onChangeText={(digitado) => setStatus(digitado)}
+                  value={status}
+                  inputMode='text'
+                  placeholder="Status"
                   placeholderTextColor='white'
                 />
               </View>
