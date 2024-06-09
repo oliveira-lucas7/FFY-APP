@@ -2,7 +2,7 @@ import { View, Text, StyleSheet, ActivityIndicator, FlatList, Animated } from 'r
 import React, { useEffect, useState, useRef } from 'react';
 import { useFocusEffect } from '@react-navigation/native';
 
-import Objetos from './Objetos'; // Assumindo que o componente é chamado Objetos
+import Objetos from './Objetos';
 
 export default function Home() {
 
@@ -12,7 +12,7 @@ export default function Home() {
 
   async function getObjetos() {
     try {
-      const response = await fetch('http://10.139.75.10:5251/api/Objeto/GetAllObjeto', {
+      const response = await fetch('http://192.168.10.4/api/Objeto/GetAllObjeto', {
         method: 'GET',
         headers: {
           'Content-Type': 'application/json',

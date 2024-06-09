@@ -1,10 +1,11 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { TouchableOpacity, Alert } from 'react-native';
 import { View, Text, ScrollView, TextInput, StyleSheet, Image } from 'react-native';
-import Objetos from './Objetos';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import { format } from 'date-fns';
 
 export default function AdicionarObjeto() {
-
+  const [userId, setUserId] = useState(null);
   const [nome, setNome] = useState("");
   const [cor, setCor] = useState("");
   const [observacao, setObservacao] = useState("");
@@ -12,25 +13,45 @@ export default function AdicionarObjeto() {
   const [foto, setFoto] = useState("");
   const [desaparecimento, setDesaparecimento] = useState("");
   const [encontro, setEncontro] = useState("");
-  const [status, setStatus] = useState("")
+  const [status, setStatus] = useState("");
   const [sucesso, setSucesso] = useState(false);
   const [erro, setErro] = useState(false);
 
+  useEffect(() => {
+    const getUserId = async () => {
+      try {
+        const storedUserId = await AsyncStorage.getItem('userId');
+        if (storedUserId) {
+          setUserId(storedUserId);
+        } else {
+          Alert.alert("Erro", "ID do usuário não encontrado");
+        }
+      } catch (error) {
+        console.error(error);
+      }
+    };
+    getUserId();
+  }, []);
+
   async function Cadastro() {
     try {
-      const response = await fetch('http://10.139.75.10:5251/api/Objeto/CreateObjeto', {
+      const formattedDesaparecimento = format(new Date(desaparecimento), "yyyy-MM-dd'T'HH:mm:ss");
+      const formattedEncontro = encontro ? format(new Date(encontro), "yyyy-MM-dd'T'HH:mm:ss") : null;
+
+      const response = await fetch('http://192.168.10.4/api/Objeto/CreateObjeto', {
         method: "POST",
         headers: {
           'Content-Type': 'application/json'
         },
         body: JSON.stringify({
+          UserId: userId,
           ObjetoNome: nome,
           ObjetoCor: cor,
           ObjetoObservacao: observacao,
           ObjetoLocalDesaparecimento: local,
           ObjetoFoto: foto,
-          ObjetoDtDesaparecimento: desaparecimento,
-          ObjetoDtEncontro: encontro,
+          ObjetoDtDesaparecimento: formattedDesaparecimento,
+          ObjetoDtEncontro: formattedEncontro,
           ObjetoStatus: status,
         })
       });
@@ -60,7 +81,7 @@ export default function AdicionarObjeto() {
       </View>
       <>
         {sucesso ? (
-          <Text>Obrigado por se cadastrar! Seu cadastro foi realizado com sucesso!</Text>
+          <Text>Obrigado por cadastrar seu objeto!</Text>
         ) : (
           <>
             <View>
@@ -95,7 +116,6 @@ export default function AdicionarObjeto() {
                   inputMode='text'
                   placeholder="Observação"
                   placeholderTextColor='white'
-                  secureTextEntry={true}
                 />
               </View>
               <View style={styles.inputContainer}>
@@ -124,7 +144,7 @@ export default function AdicionarObjeto() {
                   onChangeText={(digitado) => setDesaparecimento(digitado)}
                   value={desaparecimento}
                   inputMode='text'
-                  placeholder="Data de desaparecimento"
+                  placeholder="Data de desaparecimento (YYYY-MM-DDTHH:MM:SS)"
                   placeholderTextColor='white'
                 />
               </View>
@@ -134,9 +154,8 @@ export default function AdicionarObjeto() {
                   onChangeText={(digitado) => setEncontro(digitado)}
                   value={encontro}
                   inputMode='text'
-                  placeholder="Data de encontro"
+                  placeholder="Data de encontro (YYYY-MM-DDTHH:MM:SS)"
                   placeholderTextColor='white'
-                  secureTextEntry={true}
                 />
               </View>
               <View style={styles.inputContainer}>
@@ -149,7 +168,6 @@ export default function AdicionarObjeto() {
                   placeholderTextColor='white'
                 />
               </View>
-              {/* Adicione mais campos de entrada conforme necessário */}
               <TouchableOpacity style={styles.cadastro} onPress={Cadastro}>
                 <Text style={styles.cadastroText}>Cadastrar</Text>
               </TouchableOpacity>
