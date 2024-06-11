@@ -1,9 +1,8 @@
-import React, { useState } from 'react';
-import { TouchableOpacity, Alert } from 'react-native';
-import { View, Text, ScrollView, TextInput, StyleSheet, Image } from 'react-native';
+import React, { useContext, useState } from 'react';
+import { View, Text, ScrollView, TextInput, TouchableOpacity, StyleSheet, Image, Alert } from 'react-native';
+import { AuthContext } from '../Context/AuthContext';
 
-export default function InserirUsuario() {
-
+export default function InserirUsuario({ navigation }) {
   const [nome, setNome] = useState("");
   const [telefone, setTelefone] = useState("");
   const [email, setEmail] = useState("");
@@ -11,38 +10,13 @@ export default function InserirUsuario() {
   const [erro, setErro] = useState(false);
   const [sucesso, setSucesso] = useState(false);
 
-  async function Cadastro() {
-    try {
-      const response = await fetch('http://10.139.75.10:5251/api/Usuario/CreateUsuario', {
-        method: "POST",
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({
-          UsuarioNome: nome,
-          UsuarioTelefone: telefone,
-          UsuarioEmail: email,
-          UsuarioSenha: senha,
-        })
-      });
+  const{ RealizaCadastro, error, sucessCadastro, toggleScreen, cadastro} = useContext(AuthContext)
 
-      if (!response.ok) {
-        throw new Error('Erro ao cadastrar');
-      }
-
-      const json = await response.json();
-
-      if (json.id) {
-        setSucesso(true);
-        Alert.alert("Sucesso", "Cadastro realizado com sucesso!");
-      } else {
-        throw new Error('Erro ao cadastrar');
-      }
-    } catch (error) {
-      setErro(true);
-      Alert.alert("Erro", "Ocorreu um erro ao realizar o cadastro. Tente novamente.");
-    }
+  function Cadastro()
+  {
+    RealizaCadastro(email, nome, senha, telefone)
   }
+
 
   return (
     <ScrollView contentContainerStyle={styles.forms}>
@@ -51,7 +25,9 @@ export default function InserirUsuario() {
       </View>
       <>
         {sucesso ? (
-          <Text>Obrigado por se cadastrar! Seu cadastro foi realizado com sucesso!</Text>
+          <View style={styles.container}>
+            <Text>Obrigado por se cadastrar! Seu cadastro foi realizado com sucesso!</Text>
+          </View>
         ) : (
           <>
             <View>
@@ -99,7 +75,6 @@ export default function InserirUsuario() {
                   placeholderTextColor='white'
                 />
               </View>
-              {/* Adicione mais campos de entrada conforme necessário */}
               <TouchableOpacity style={styles.cadastro} onPress={Cadastro}>
                 <Text style={styles.cadastroText}>Cadastrar</Text>
               </TouchableOpacity>
@@ -119,14 +94,6 @@ const styles = StyleSheet.create({
     width: '100%',
     marginBottom: 20,
   },
-  inputContainerDois: {
-    flex: 1,
-    width: '100%',
-    display: "flex",
-    flexDirection: "row",
-    justifyContent: "space-around",
-    marginBottom: 20,
-  },
   textTitle: {
     fontSize: 20,
     textAlign: "center",
@@ -141,15 +108,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center', 
     alignItems: 'center',
     width: "100%",
-    marginTop: 50
-  },
-  inputConjunto: {
-    width: '50%',
-    height: 60,
-    padding: 10,
-    borderRadius: 3,
-    backgroundColor: "#595959",
-    color: "white"
+    marginTop: 130
   },
   input: {
     width: '100%',
@@ -172,7 +131,10 @@ const styles = StyleSheet.create({
     paddingHorizontal: '5%',
     marginTop: 35,
     display: "flex",
-    flexDirection: "column"
+    justifyContent: "center",
+    flexDirection: "column",
+    alignContent: "center",
+    alignItems: "center"
   },
   cadastro: {
     backgroundColor: "#4BBEE7",

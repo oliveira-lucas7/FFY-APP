@@ -12,7 +12,7 @@ export default function Home() {
 
   async function getObjetos() {
     try {
-      const response = await fetch('http://192.168.10.4/api/Objeto/GetAllObjeto', {
+      const response = await fetch('http://10.139.75.17:5251/api/Objeto/GetAllObjeto', {
         method: 'GET',
         headers: {
           'Content-Type': 'application/json',
