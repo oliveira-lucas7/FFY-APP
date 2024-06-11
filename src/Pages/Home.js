@@ -5,7 +5,6 @@ import { useFocusEffect } from '@react-navigation/native';
 import Objetos from './Objetos';
 
 export default function Home() {
-
   const [objetos, setObjetos] = useState([]);
   const [error, setError] = useState(false);
   const fade = useRef(new Animated.Value(0)).current;
@@ -22,7 +21,6 @@ export default function Home() {
       if (response.ok) {
         const json = await response.json();
         setObjetos(json);
-        console.log(objetos)
       } else {
         setError(true);
       }
@@ -31,15 +29,12 @@ export default function Home() {
     }
   }
 
-  useEffect(() => {
-    getObjetos();
-  }, []);
-
   useFocusEffect(
     React.useCallback(() => {
+      getObjetos(); // Chama a função getObjetos quando a tela ganha foco
       fade.setValue(0);
       Animated.timing(fade, {
-        toValue: 10,
+        toValue: 1,
         duration: 3000,
         useNativeDriver: true,
       }).start();
