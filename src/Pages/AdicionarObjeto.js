@@ -3,10 +3,10 @@ import { TouchableOpacity, Alert, ScrollView, TextInput, StyleSheet, View, Text,
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import DateTimePicker from '@react-native-community/datetimepicker';
 import { format } from 'date-fns';
-import { useNavigation } from '@react-navigation/native'; // Import navigation
+import { useNavigation } from '@react-navigation/native'; 
 
 export default function AdicionarObjeto() {
-  const navigation = useNavigation(); // Initialize navigation
+  const navigation = useNavigation(); 
   const [userId, setUserId] = useState(null);
   const [nome, setNome] = useState("");
   const [cor, setCor] = useState("");
@@ -18,7 +18,7 @@ export default function AdicionarObjeto() {
   const [status, setStatus] = useState("");
   const [showDesaparecimentoPicker, setShowDesaparecimentoPicker] = useState(false);
   const [showEncontroPicker, setShowEncontroPicker] = useState(false);
-  const [erro, setErro] = useState(false); // Adiciona o estado de erro
+  const [erro, setErro] = useState(false); 
 
   useEffect(() => {
     const getUserId = async () => {
@@ -41,7 +41,7 @@ export default function AdicionarObjeto() {
       const formattedDesaparecimento = format(desaparecimento, "yyyy-MM-dd'T'HH:mm:ss");
       const formattedEncontro = format(encontro, "yyyy-MM-dd'T'HH:mm:ss");
 
-      const response = await fetch('http://10.139.75.17:5251/api/Objeto/CreateObjeto', {
+      const response = await fetch('http://192.168.10.5/api/Objeto/CreateObjeto', {
         method: "POST",
         headers: {
           'Content-Type': 'application/json'
@@ -59,19 +59,33 @@ export default function AdicionarObjeto() {
         })
       });
 
+      const json = await response.json();
+
       if (!response.ok) {
+        console.error('Resposta não ok:', json);
         throw new Error('Erro ao cadastrar');
       }
 
-      const json = await response.json();
-
-      if (json.id) {
+      if (json && json.objetoId) { // Verifica o campo correto na resposta
         Alert.alert("Sucesso", "Cadastro realizado com sucesso!");
-        navigation.navigate('Home', { refresh: true }); // Navigate to Home and trigger refresh
+        navigation.navigate('Home', { refresh: true }); // Navegar para Home e acionar refresh
+
+        // Limpar todos os campos
+        setNome("");
+        setCor("");
+        setObservacao("");
+        setLocal("");
+        setFoto("");
+        setDesaparecimento(new Date());
+        setEncontro(new Date());
+        setStatus("");
+        setErro(false);
       } else {
+        console.error('JSON inesperado:', json);
         throw new Error('Erro ao cadastrar');
       }
     } catch (error) {
+      console.error('Erro no catch:', error);
       setErro(true); // Define o erro para true
       Alert.alert("Erro", "Ocorreu um erro ao realizar o cadastro. Tente novamente.");
     }

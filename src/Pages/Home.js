@@ -11,7 +11,7 @@ export default function Home() {
 
   async function getObjetos() {
     try {
-      const response = await fetch('http://10.139.75.17:5251/api/Objeto/GetAllObjeto', {
+      const response = await fetch('http://192.168.10.5/api/Objeto/GetAllObjeto', {
         method: 'GET',
         headers: {
           'Content-Type': 'application/json',
@@ -65,7 +65,7 @@ export default function Home() {
               />
             )}
             keyExtractor={(item, index) => item.id ? item.id.toString() : index.toString()}
-            contentContainerStyle={{ height: (objetos.length * 575) / 2 }}
+            contentContainerStyle={{ height: (objetos.length * 655) / 4 }}
             horizontal={false}
             numColumns={2}
           />

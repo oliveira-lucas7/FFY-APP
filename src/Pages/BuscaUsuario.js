@@ -13,7 +13,7 @@ export default function BuscaUsuario() {
     const [userSenha, setUserSenha] = useState();
 
     async function getUsuarios() {
-        await fetch('http://10.139.75.17:5251/api/Usuario/GetAllUsuario', {
+        await fetch('http://192.168.10.5/api/Usuario/GetAllUsuario', {
             method: 'GET',
             headers: {
                 'content-type': 'application/json'

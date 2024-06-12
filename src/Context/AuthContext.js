@@ -13,7 +13,7 @@ export default function AuthProvider({ children }) {
   const [showCadastro, setShowCadastro] = useState(false);
 
   async function Login(email, senha) {
-    await fetch('http://10.139.75.17:5251/api/Usuario/Login', {
+    await fetch('http://192.168.10.5/api/Usuario/Login', {
       method: 'POST',
       headers: {
         'content-type': 'application/json'
@@ -55,7 +55,7 @@ export default function AuthProvider({ children }) {
     }
 
   async function RealizaCadastro(nome, telefone, email, senha) {
-     await fetch('http://10.139.75.17:5251/api/Usuario/CreateUsuario', {
+     await fetch('http://192.168.10.5/api/Usuario/CreateUsuario', {
         method: 'POST',
         headers: {
           'content-type': 'application/json'

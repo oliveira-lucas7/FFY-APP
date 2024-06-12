@@ -38,11 +38,11 @@ export default function Login() {
                     secureTextEntry={true}
                     placeholderTextColor='white'
                 />
-                <View style={styles.textSenha}>
+                {/* <View style={styles.textSenha}>
                     <TouchableOpacity>
                         <Text style={styles.recursoSenha}>Esqueci a senha</Text>
                     </TouchableOpacity>
-                </View>
+                </View> */}
                 <TouchableOpacity style={styles.login} onPress={RealizaLogin}>
                     <Text style={styles.btnText}>Entrar</Text>
                 </TouchableOpacity>
