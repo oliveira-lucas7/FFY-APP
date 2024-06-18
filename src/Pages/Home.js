@@ -11,7 +11,7 @@ export default function Home() {
 
   async function getObjetos() {
     try {
-      const response = await fetch('http://192.168.10.5/api/Objeto/GetAllObjeto', {
+      const response = await fetch('http://10.139.75.33:5251/api/Objeto/GetAllObjeto', {
         method: 'GET',
         headers: {
           'Content-Type': 'application/json',
@@ -31,7 +31,7 @@ export default function Home() {
 
   useFocusEffect(
     React.useCallback(() => {
-      getObjetos(); // Chama a função getObjetos quando a tela ganha foco
+      getObjetos(); 
       fade.setValue(0);
       Animated.timing(fade, {
         toValue: 1,
@@ -65,7 +65,7 @@ export default function Home() {
               />
             )}
             keyExtractor={(item, index) => item.id ? item.id.toString() : index.toString()}
-            contentContainerStyle={{ height: (objetos.length * 655) / 4 }}
+            contentContainerStyle={{ height: (objetos.length * 355) / 2 }}
             horizontal={false}
             numColumns={2}
           />

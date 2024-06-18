@@ -5,8 +5,7 @@ import React, { useContext, useEffect, useState } from 'react';
 
 import Home from '../Pages/Home';
 import AdicionarObjetos from '../Pages/AdicionarObjeto';
-import Login from '../Pages/Login';
-import Inserir from '../Pages/InserirUsuario';
+import Observacoes from '../Pages/Observacoes';
 import BuscaUsuario from '../Pages/BuscaUsuario';
 import AuthScreen from '../Pages/AuthScreen';
 
@@ -61,12 +60,12 @@ export default function Rotas() {
           }}
         />
         <Tab.Screen
-          name="Inserir"
-          component={Inserir}
+          name="Observacoes"
+          component={Observacoes}
           options={{
             tabBarLabel: () => null,
             tabBarIcon: ({ color, size }) => (
-              <MaterialCommunityIcons name="file-excel-box" color={color} size={35} />
+              <MaterialCommunityIcons name="plus" color={color} size={35} />
             ),
           }}
         />
@@ -76,7 +75,7 @@ export default function Rotas() {
           options={{
             tabBarLabel: () => null,
             tabBarIcon: ({ color, size }) => (
-              <MaterialCommunityIcons name="play" color={color} size={35} />
+              <MaterialCommunityIcons name="magnify" color={color} size={35} />
             ),
           }}
         />

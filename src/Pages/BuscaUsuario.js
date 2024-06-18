@@ -13,7 +13,7 @@ export default function BuscaUsuario() {
     const [userSenha, setUserSenha] = useState();
 
     async function getUsuarios() {
-        await fetch('http://192.168.10.5/api/Usuario/GetAllUsuario', {
+        await fetch('http://10.139.75.33:5251/api/Usuario/GetAllUsuario', {
             method: 'GET',
             headers: {
                 'content-type': 'application/json'
@@ -38,6 +38,7 @@ export default function BuscaUsuario() {
                 <Image style={styles.image} source={require('../../images/LogoTec.png')}
                 />
             </View> 
+            <Text style={styles.cardTitle}>Pesquisar Usuário</Text>
             <View style={styles.inputContainer}>
                 <TextInput
                     style={styles.input}

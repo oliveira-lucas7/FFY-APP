@@ -3,21 +3,20 @@ import { TouchableOpacity, Alert, ScrollView, TextInput, StyleSheet, View, Text,
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import DateTimePicker from '@react-native-community/datetimepicker';
 import { format } from 'date-fns';
-import { useNavigation } from '@react-navigation/native'; 
+import { useNavigation, useRoute } from '@react-navigation/native'; 
 
-export default function AdicionarObjeto() {
+export default function CadastroObservacoes() {
   const navigation = useNavigation(); 
+  const route = useRoute();
+
   const [userId, setUserId] = useState(null);
-  const [nome, setNome] = useState("");
-  const [cor, setCor] = useState("");
-  const [observacao, setObservacao] = useState("");
+  const [objetoId, setObjetoId] = useState(null);
+
+  const [descricao, setDescricao] = useState("");
   const [local, setLocal] = useState("");
-  const [foto, setFoto] = useState("");
-  const [desaparecimento, setDesaparecimento] = useState(new Date());
-  const [encontro, setEncontro] = useState(new Date());
-  const [status, setStatus] = useState("");
+  const [data, setData] = useState(new Date());
+
   const [showDesaparecimentoPicker, setShowDesaparecimentoPicker] = useState(false);
-  const [showEncontroPicker, setShowEncontroPicker] = useState(false);
   const [erro, setErro] = useState(false); 
 
   useEffect(() => {
@@ -34,28 +33,27 @@ export default function AdicionarObjeto() {
       }
     };
     getUserId();
-  }, []);
+
+    if (route.params && route.params.objetoId) {
+      setObjetoId(route.params.objetoId);
+    }
+  }, [route.params]);
 
   async function Cadastro() {
     try {
-      const formattedDesaparecimento = format(desaparecimento, "yyyy-MM-dd'T'HH:mm:ss");
-      const formattedEncontro = format(encontro, "yyyy-MM-dd'T'HH:mm:ss");
+      const formattedData = format(data, "yyyy-MM-dd'T'HH:mm:ss");
 
-      const response = await fetch('http://10.139.75.33:5251/api/Objeto/CreateObjeto', {
+      const response = await fetch('http://10.139.75.33:5251/api/Observacoes/CreateObservacoes', {
         method: "POST",
         headers: {
           'Content-Type': 'application/json'
         },
         body: JSON.stringify({
-          ObjetoNome: nome,
-          ObjetoCor: cor,
-          ObjetoObservacao: observacao,
-          ObjetoLocalDesaparecimento: local,
-          ObjetoFoto: foto,
-          ObjetoDtDesaparecimento: formattedDesaparecimento,
-          ObjetoDtEncontro: formattedEncontro,
-          ObjetoStatus: status,
+          ObservacoesDescricao: descricao,
+          ObservacoesLocal: local,
+          ObservacoesData: formattedData,
           UsuarioId: userId,
+          ObjetoId: objetoId,
         })
       });
 
@@ -66,19 +64,13 @@ export default function AdicionarObjeto() {
         throw new Error('Erro ao cadastrar');
       }
 
-      if (json && json.objetoId) { 
+      if (json && json.observacoesId) { 
         Alert.alert("Sucesso", "Cadastro realizado com sucesso!");
-        await AsyncStorage.setItem('objetoId', json.objetoId.toString());
-        navigation.navigate('CadastroObservacoes'); 
+        navigation.navigate('Home', { refresh: true }); 
 
-        setNome("");
-        setCor("");
-        setObservacao("");
+        setDescricao("");
         setLocal("");
-        setFoto("");
-        setDesaparecimento(new Date());
-        setEncontro(new Date());
-        setStatus("");
+        setData(new Date());
         setErro(false);
       } else {
         console.error('JSON inesperado:', json);
@@ -86,7 +78,7 @@ export default function AdicionarObjeto() {
       }
     } catch (error) {
       console.error('Erro no catch:', error);
-      setErro(true); 
+      setErro(true);
       Alert.alert("Erro", "Ocorreu um erro ao realizar o cadastro. Tente novamente.");
     }
   }
@@ -97,33 +89,15 @@ export default function AdicionarObjeto() {
         <Image style={styles.image} source={require('../../images/LogoTec.png')} />
       </View>
       <View>
-        <Text style={styles.textTitle}>Cadastro de Objeto</Text>
+        <Text style={styles.textTitle}>Cadastro de Observações</Text>
       </View>
       <View style={styles.container}>
         <View style={styles.inputContainer}>
           <TextInput
             style={styles.input}
-            onChangeText={setNome}
-            value={nome}
-            placeholder="Objeto"
-            placeholderTextColor='white'
-          />
-        </View>
-        <View style={styles.inputContainer}>
-          <TextInput
-            style={styles.input}
-            onChangeText={setCor}
-            value={cor}
-            placeholder="Cor"
-            placeholderTextColor='white'
-          />
-        </View>
-        <View style={styles.inputContainer}>
-          <TextInput
-            style={styles.input}
-            onChangeText={setObservacao}
-            value={observacao}
-            placeholder="Observação"
+            onChangeText={setDescricao}
+            value={descricao}
+            placeholder="Descrição"
             placeholderTextColor='white'
           />
         </View>
@@ -132,25 +106,7 @@ export default function AdicionarObjeto() {
             style={styles.input}
             onChangeText={setLocal}
             value={local}
-            placeholder="Local que perdeu"
-            placeholderTextColor='white'
-          />
-        </View>
-        <View style={styles.inputContainer}>
-          <TextInput
-            style={styles.input}
-            onChangeText={setFoto}
-            value={foto}
-            placeholder="Url da imagem"
-            placeholderTextColor='white'
-          />
-        </View>
-        <View style={styles.inputContainer}>
-          <TextInput
-            style={styles.input}
-            onChangeText={setStatus}
-            value={status}
-            placeholder="Status"
+            placeholder="Local"
             placeholderTextColor='white'
           />
         </View>
@@ -158,37 +114,23 @@ export default function AdicionarObjeto() {
           style={styles.datePickerButton}
           onPress={() => setShowDesaparecimentoPicker(true)}
         >
-          <Text style={styles.datePickerText}>Selecionar Data e Hora do Desaparecimento</Text>
+          <Text style={styles.datePickerText}>Selecionar Data e Hora</Text>
         </TouchableOpacity>
         {showDesaparecimentoPicker && (
           <DateTimePicker
-            value={desaparecimento}
-            mode="date"
-            display="default"
+            value={data}
+            mode="datetime"
+            display="spinner"
             onChange={(event, selectedDate) => {
               setShowDesaparecimentoPicker(false);
               if (selectedDate) {
-                setDesaparecimento(selectedDate);
-                setShowEncontroPicker(true);
-              }
-            }}
-          />
-        )}
-        {showEncontroPicker && (
-          <DateTimePicker
-            value={encontro}
-            mode="date"
-            display="default"
-            onChange={(event, selectedDate) => {
-              setShowEncontroPicker(false);
-              if (selectedDate) {
-                setEncontro(selectedDate);
+                setData(selectedDate);
               }
             }}
           />
         )}
         <TouchableOpacity style={styles.cadastro} onPress={Cadastro}>
-          <Text style={styles.cadastroText}>Cadastrar</Text>
+          <Text style={styles.cadastroText}>Cadastrar Observação</Text>
         </TouchableOpacity>
         {erro && <Text style={styles.errorText}>Revise cuidadosamente todos os campos</Text>}
       </View>
@@ -223,7 +165,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
     width: "100%",
-    marginTop: 50
+    marginTop: 150
   },
   datePickerButton: {
     backgroundColor: "#4BBEE7",

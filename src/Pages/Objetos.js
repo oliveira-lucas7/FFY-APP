@@ -30,6 +30,9 @@ export default function Objetos({ nome, cor, observacao, local, foto, dtDesapare
             <Text style={styles.modalText}>Observação: {observacao}</Text>
             <Text style={styles.modalText}>Data de Desaparecimento: {dtDesaparecimento}</Text>
             <Text style={styles.modalText}>Data de Encontro: {dtEncontro}</Text>
+            <TouchableOpacity style={styles.buttonClose}>
+              <Text style={styles.modalObs}>Observações</Text>
+            </TouchableOpacity>
             <TouchableOpacity style={styles.buttonClose} onPress={() => setModalVisible(!modalVisible)}>
               <Text style={styles.modalClose}>Fechar</Text>
             </TouchableOpacity>
@@ -42,7 +45,7 @@ export default function Objetos({ nome, cor, observacao, local, foto, dtDesapare
 
 const styles = StyleSheet.create({
   item: {
-    backgroundColor: '#fff', // Preto
+    backgroundColor: '#fff', 
     borderRadius: 10,
     padding: 15,
     margin: 10,
@@ -89,10 +92,10 @@ const styles = StyleSheet.create({
     backgroundColor: '#fff',
     borderRadius: 10,
     padding: 20,
-    width: '90%', // Aumento da largura do modal
-    height: '55%', // Aumento da altura do modal
+    width: '90%',
+    height: '55%', 
     alignItems: 'center',
-    justifyContent: 'center', // Centralização vertical
+    justifyContent: 'center',
   },
   modalTitle: {
     fontSize: 18,
@@ -101,29 +104,35 @@ const styles = StyleSheet.create({
   },
   modalText: {
     fontSize: 16,
-    marginBottom: 20, // Espaçamento inferior aumentado
-    textAlign: 'center', // Centralização horizontal
+    marginBottom: 20,
+    textAlign: 'center', 
   },
   modalClose: {
     fontSize: 16,
     color: '#fff',
+    paddingHorizontal: 80
+  },
+  modalObs: {
+    fontSize: 16,
+    color: '#fff',
+    paddingHorizontal: 58
   },
   button: {
-    backgroundColor: '#4BBEE7', // Azul marinho
+    backgroundColor: '#4BBEE7', 
     paddingVertical: 10,
     paddingHorizontal: 20,
     borderRadius: 10,
     marginTop: 10,
   },
   buttonClose: {
-    backgroundColor: '#4BBEE7', // Azul marinho
+    backgroundColor: '#4BBEE7', 
     paddingVertical: 15,
     paddingHorizontal: 30,
     borderRadius: 10,
     marginTop: 10,
   },
   buttonText: {
-    color: '#fff', // Preto
+    color: '#fff', 
     fontSize: 16,
     fontWeight: 'bold',
   },
