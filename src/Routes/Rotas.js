@@ -22,7 +22,7 @@ export default function Rotas() {
   useEffect(() => {
     const verificarUsuarioAsyncStorage = async () => {
       const userId = await AsyncStorage.getItem("userId")
-      if ( userId !== null) {
+      if (userId !== null) {
         setUsuarioSalvoNoAsync(true);
       }
     };
@@ -32,56 +32,48 @@ export default function Rotas() {
   return (
     <NavigationContainer>
       {logado || usuarioSalvoNoAsync ? (
-      <Tab.Navigator screenOptions={{
-        headerShown: false,
-        tabBarActiveTintColor: "#4BBEE7",
-        tabBarInactiveTintColor: "white",
-        tabBarStyle: { backgroundColor: "black" },
-        tabBarShowLabel: false
-      }}>
-        <Tab.Screen
-          name="Home"
-          component={Home}
-          options={{
-            tabBarLabel: () => null,
-            tabBarIcon: ({ color, size }) => (
-              <MaterialCommunityIcons name="home" color={color} size={35} />
-            ),
+        <Tab.Navigator
+          screenOptions={{
+            headerShown: false,
+            tabBarActiveTintColor: "#4BBEE7",
+            tabBarInactiveTintColor: "white",
+            tabBarStyle: { backgroundColor: "black" },
+            tabBarShowLabel: false
           }}
-        />
-        <Tab.Screen
-          name="AdicionarObjetos"
-          component={AdicionarObjetos}
-          options={{
-            tabBarLabel: () => null,
-            tabBarIcon: ({ color, size }) => (
-              <MaterialCommunityIcons name="plus-circle" color={color} size={35} />
-            ),
-          }}
-        />
-        <Tab.Screen
-          name="Observacoes"
-          component={Observacoes}
-          options={{
-            tabBarLabel: () => null,
-            tabBarIcon: ({ color, size }) => (
-              <MaterialCommunityIcons name="plus" color={color} size={35} />
-            ),
-          }}
-        />
-        <Tab.Screen
-          name="BuscaUsuario"
-          component={BuscaUsuario}
-          options={{
-            tabBarLabel: () => null,
-            tabBarIcon: ({ color, size }) => (
-              <MaterialCommunityIcons name="magnify" color={color} size={35} />
-            ),
-          }}
-        />
-      </Tab.Navigator>
+        >
+          <Tab.Screen
+            name="Home"
+            component={Home}
+            options={{
+              tabBarLabel: () => null,
+              tabBarIcon: ({ color, size }) => (
+                <MaterialCommunityIcons name="home" color={color} size={35} />
+              ),
+            }}
+          />
+          <Tab.Screen
+            name="AdicionarObjetos"
+            component={AdicionarObjetos}
+            options={{
+              tabBarLabel: () => null,
+              tabBarIcon: ({ color, size }) => (
+                <MaterialCommunityIcons name="plus-circle" color={color} size={35} />
+              ),
+            }}
+          />
+          <Tab.Screen
+            name="BuscaUsuario"
+            component={BuscaUsuario}
+            options={{
+              tabBarLabel: () => null,
+              tabBarIcon: ({ color, size }) => (
+                <MaterialCommunityIcons name="magnify" color={color} size={35} />
+              ),
+            }}
+          />
+        </Tab.Navigator>
       ) : (
-        <AuthScreen/>
+        <AuthScreen />
       )}
     </NavigationContainer>
   );

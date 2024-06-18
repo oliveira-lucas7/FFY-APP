@@ -1,17 +1,26 @@
-import { View, Text, StyleSheet, ActivityIndicator, FlatList, Animated } from 'react-native';
-import React, { useEffect, useState, useRef } from 'react';
+import { View, Text, StyleSheet, ActivityIndicator, FlatList, Animated, TouchableOpacity } from 'react-native';
+import React, { useEffect, useState, useRef, useContext } from 'react';
 import { useFocusEffect } from '@react-navigation/native';
 
 import Objetos from './Objetos';
+import { AuthContext } from '../Context/AuthContext';
+import Observacao from './Observacoes';
+import Detalhes from './Detalhes'
 
 export default function Home() {
   const [objetos, setObjetos] = useState([]);
   const [error, setError] = useState(false);
   const fade = useRef(new Animated.Value(0)).current;
 
+  const [exibirobservacao, setExibirObservacao] = useState(false)
+  const [exibirObjetos, setExibirObjetos] = useState(false)
+  const[ exibirDetalhes, setExibirDetalhes] = useState(false)
+
+  const [ objeto, setObjeto] = useState()
+
   async function getObjetos() {
     try {
-      const response = await fetch('http://10.139.75.33:5251/api/Objeto/GetAllObjeto', {
+      const response = await fetch('http://10.139.75.33:5251/api/Objeto/GetAllStatus1', {
         method: 'GET',
         headers: {
           'Content-Type': 'application/json',
@@ -31,7 +40,7 @@ export default function Home() {
 
   useFocusEffect(
     React.useCallback(() => {
-      getObjetos(); 
+      getObjetos();
       fade.setValue(0);
       Animated.timing(fade, {
         toValue: 1,
@@ -40,9 +49,16 @@ export default function Home() {
       }).start();
     }, [fade])
   );
+  function exibirDetalhesdoobjeto(item){
+    setExibirDetalhes(true)
+    setObjeto(item)
+  }
+
+
 
   return (
     <Animated.View style={{ opacity: fade }}>
+      {!exibirDetalhes ? 
       <View style={styles.container}>
         <View style={styles.containerProducts}>
           <Text style={styles.products}>Objetos Perdidos</Text>
@@ -53,26 +69,32 @@ export default function Home() {
           <FlatList
             data={objetos}
             renderItem={({ item }) => (
-              <Objetos
-                nome={item.objetoNome}
-                cor={item.objetoCor}
-                foto={item.objetoFoto}
-                observacao={item.objetoObservacao}
-                local={item.objetoLocalDesaparecimento}
-                dtDesaparecimento={item.objetoDtDesaparecimento}
-                dtEncontro={item.objetoDtEncontro}
-                status={item.objetoStatus}
-              />
+              <View style={styles.containerObjetos}>
+                <Objetos
+                  id={item.id}
+                  nome={item.objetoNome}
+                  cor={item.objetoCor}
+                  foto={item.objetoFoto}
+                  observacao={item.objetoObservacao}
+                  local={item.objetoLocalDesaparecimento}
+                  dtDesaparecimento={item.objetoDtDesaparecimento}
+                  dtEncontro={item.objetoDtEncontro}
+                  status={item.objetoStatus}
+                />
+                <TouchableOpacity style={styles.button} onPress={() => exibirDetalhesdoobjeto(item)}>
+                  <Text style={styles.buttonText}>Detalhes</Text>
+                </TouchableOpacity>
+            </View>
             )}
-            keyExtractor={(item, index) => item.id ? item.id.toString() : index.toString()}
-            contentContainerStyle={{ height: (objetos.length * 355) / 2 }}
-            horizontal={false}
-            numColumns={2}
+            keyExtractor={(item, index) => index.toString()}
           />
         ) : (
           <ActivityIndicator size="large" color="#00ff00" />
         )}
       </View>
+      :
+        <Detalhes handle={setExibirDetalhes} objeto={objeto}/>
+      }
     </Animated.View>
   );
 }
@@ -80,7 +102,7 @@ export default function Home() {
 const styles = StyleSheet.create({
   container: {
     backgroundColor: "#161616",
-    height: "100%",
+    // height: "100%",
     alignItems: "center",
     justifyContent: "center",
   },
@@ -101,4 +123,28 @@ const styles = StyleSheet.create({
     color: 'red',
     marginTop: 20,
   },
+  button: {
+    color: "white",
+    backgroundColor: "#4BBEE7",
+    display: "flex",
+    justifyContent: "center",
+    alignSelf: "center",
+    textAlign: "center",
+    alignItems: "center",
+    paddingVertical: 10,
+    width: "90%",
+    borderRadius: 5
+  },
+  containerObjetos: {
+    backgroundColor: "#000",
+    borderRadius: 15,
+    marginVertical: 10,
+    marginHorizontal: 20,
+    padding: 15,
+    display: "flex",
+    flexDirection: "column",
+    justifyContent: "center",
+    marginBottom: 50,
+    // marginTop: -10
+  }
 });

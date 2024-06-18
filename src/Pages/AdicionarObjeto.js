@@ -41,7 +41,7 @@ export default function AdicionarObjeto() {
       const formattedDesaparecimento = format(desaparecimento, "yyyy-MM-dd'T'HH:mm:ss");
       const formattedEncontro = format(encontro, "yyyy-MM-dd'T'HH:mm:ss");
 
-      const response = await fetch('http://10.139.75.33:5251/api/Objeto/CreateObjeto', {
+      const response = await fetch('http://192.168.10.5/api/Objeto/CreateObjeto', {
         method: "POST",
         headers: {
           'Content-Type': 'application/json'
@@ -66,11 +66,11 @@ export default function AdicionarObjeto() {
         throw new Error('Erro ao cadastrar');
       }
 
-      if (json && json.objetoId) { 
+      if (json && json.objetoId) { // Verifica o campo correto na resposta
         Alert.alert("Sucesso", "Cadastro realizado com sucesso!");
-        await AsyncStorage.setItem('objetoId', json.objetoId.toString());
-        navigation.navigate('CadastroObservacoes'); 
+        navigation.navigate('Home', { refresh: true }); // Navegar para Home e acionar refresh
 
+        // Limpar todos os campos
         setNome("");
         setCor("");
         setObservacao("");
@@ -86,7 +86,7 @@ export default function AdicionarObjeto() {
       }
     } catch (error) {
       console.error('Erro no catch:', error);
-      setErro(true); 
+      setErro(true); // Define o erro para true
       Alert.alert("Erro", "Ocorreu um erro ao realizar o cadastro. Tente novamente.");
     }
   }
@@ -103,8 +103,9 @@ export default function AdicionarObjeto() {
         <View style={styles.inputContainer}>
           <TextInput
             style={styles.input}
-            onChangeText={setNome}
+            onChangeText={(digitado) => setNome(digitado)}
             value={nome}
+            inputMode='text'
             placeholder="Objeto"
             placeholderTextColor='white'
           />
@@ -112,8 +113,9 @@ export default function AdicionarObjeto() {
         <View style={styles.inputContainer}>
           <TextInput
             style={styles.input}
-            onChangeText={setCor}
+            onChangeText={(digitado) => setCor(digitado)}
             value={cor}
+            inputMode='text'
             placeholder="Cor"
             placeholderTextColor='white'
           />
@@ -121,8 +123,9 @@ export default function AdicionarObjeto() {
         <View style={styles.inputContainer}>
           <TextInput
             style={styles.input}
-            onChangeText={setObservacao}
+            onChangeText={(digitado) => setObservacao(digitado)}
             value={observacao}
+            inputMode='text'
             placeholder="Observação"
             placeholderTextColor='white'
           />
@@ -130,8 +133,9 @@ export default function AdicionarObjeto() {
         <View style={styles.inputContainer}>
           <TextInput
             style={styles.input}
-            onChangeText={setLocal}
+            onChangeText={(digitado) => setLocal(digitado)}
             value={local}
+            inputMode='text'
             placeholder="Local que perdeu"
             placeholderTextColor='white'
           />
@@ -139,8 +143,9 @@ export default function AdicionarObjeto() {
         <View style={styles.inputContainer}>
           <TextInput
             style={styles.input}
-            onChangeText={setFoto}
+            onChangeText={(digitado) => setFoto(digitado)}
             value={foto}
+            inputMode='text'
             placeholder="Url da imagem"
             placeholderTextColor='white'
           />
@@ -148,8 +153,9 @@ export default function AdicionarObjeto() {
         <View style={styles.inputContainer}>
           <TextInput
             style={styles.input}
-            onChangeText={setStatus}
+            onChangeText={(digitado) => setStatus(digitado)}
             value={status}
+            inputMode='text'
             placeholder="Status"
             placeholderTextColor='white'
           />
@@ -163,8 +169,8 @@ export default function AdicionarObjeto() {
         {showDesaparecimentoPicker && (
           <DateTimePicker
             value={desaparecimento}
-            mode="date"
-            display="default"
+            mode="time"
+            display="spinner"
             onChange={(event, selectedDate) => {
               setShowDesaparecimentoPicker(false);
               if (selectedDate) {
@@ -252,7 +258,8 @@ const styles = StyleSheet.create({
     paddingHorizontal: '5%',
     marginTop: 35,
     display: "flex",
-    flexDirection: "column"
+    flexDirection: "column",
+    marginBottom: 40
   },
   cadastro: {
     backgroundColor: "#4BBEE7",
@@ -260,7 +267,7 @@ const styles = StyleSheet.create({
     width: "100%",
     padding: 15,
     borderRadius: 5,
-    marginTop: 15,
+    marginTop: 20,
     height: 60,
     display: "flex",
     margin: 'auto',
@@ -274,10 +281,8 @@ const styles = StyleSheet.create({
   },
   errorText: {
     color: 'red',
-    fontSize: 18,
     marginTop: 20,
     marginBottom: 20,
-    textAlign: "center"
   },
   textErro: {
     marginBottom: 20,

@@ -1,213 +1,163 @@
-import React, { useState, useEffect } from 'react';
-import { TouchableOpacity, Alert, ScrollView, TextInput, StyleSheet, View, Text, FlatList } from 'react-native';
-import AsyncStorage from '@react-native-async-storage/async-storage';
-import { useNavigation, useRoute } from '@react-navigation/native'; 
-import DateTimePicker from '@react-native-community/datetimepicker';
-import { format } from 'date-fns';
+import { StatusBar } from 'expo-status-bar';
+import React, { useState } from 'react';
+import { View, Text, TextInput, TouchableOpacity, StyleSheet, Alert } from 'react-native';
 
-export default function Observacoes() {
-  const navigation = useNavigation();
-  const route = useRoute();
+export default function Observacao({ handle2, item }) {
+  const [observacaoDescricao, setObservacaoDescricao] = useState('');
+  const [observacaoLocal, setObservacaoLocal] = useState('');
+  const [observacaoData, setObservacaoData] = useState('');
+  const [animalId, setAnimalId] = useState('');
+  const [usuarioId, setUsuarioId] = useState('');
+  const [sucesso, setSucesso] = useState(false);
+  const [erro, setErro] = useState(false);
 
-  const [objetoId, setObjetoId] = useState(null);
-  const [observacoes, setObservacoes] = useState([]);
-  const [descricao, setDescricao] = useState("");
-  const [local, setLocal] = useState("");
-  const [data, setData] = useState(new Date());
-  const [showDatePicker, setShowDatePicker] = useState(false);
-  const [erro, setErro] = useState(false); 
-
-  useEffect(() => {
-    if (route.params && route.params.objetoId) {
-      setObjetoId(route.params.objetoId);
-      carregarObservacoes(route.params.objetoId);
+  async function handleSubmit() {
+    if (!observacaoDescricao || !observacaoLocal || !observacaoData || !animalId || !usuarioId) {
+      Alert.alert('Erro', 'Por favor, preencha todos os campos.');
+      setErro(true);
+      return;
     }
-  }, [route.params]);
 
-  async function carregarObservacoes(objetoId) {
-    try {
-      // Carregar observações do objeto da API
-      const response = await fetch(`http://10.139.75.33:5251/api/Observacoes/GetObservacoesByObjetoId/${objetoId}`);
-      const json = await response.json();
-      if (!response.ok) {
-        console.error('Resposta não ok:', json);
-        throw new Error('Erro ao carregar observações');
+    // Formatar a data para o formato esperado pela API (yyyy-MM-dd)
+    const dataFormatada = formatarData(observacaoData);
+
+    await fetch('http://10.139.75.33:5251/api/Observacoes/CreateObservacao', {
+      method: "POST",
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        observacaoDescricao: observacaoDescricao,
+        observacaoLocal: observacaoLocal,
+        observacaoData: dataFormatada, 
+        objetoId: objetoId,
+        usuarioId: usuarioId
+      })
+    })
+    .then(res => res.json())
+    .then(data => {
+      if (data) {
+        console.log('Nova observação:', data);
+        setSucesso(true);
+        handle2(false);
+        limparCampos();
+        Alert.alert('Sucesso', 'Observação cadastrada com sucesso!');
+      } else {
+        setErro(true);
+        Alert.alert('Erro', 'Falha ao cadastrar observação.');
       }
-      setObservacoes(json);
-    } catch (error) {
-      console.error('Erro ao carregar observações:', error);
-      Alert.alert("Erro", "Ocorreu um erro ao carregar as observações.");
-    }
+    })
+    .catch(err => {
+      console.error('Erro:', err);
+      setErro(true);
+    });
   }
 
-  async function cadastrarObservacao() {
-    try {
-      const formattedData = format(data, "yyyy-MM-dd'T'HH:mm:ss");
 
-      const response = await fetch('http://10.139.75.33:5251/api/Observacoes/CreateObservacoes', {
-        method: "POST",
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({
-          ObservacoesDescricao: descricao,
-          ObservacoesLocal: local,
-          ObservacoesData: formattedData,
-          ObjetoId: objetoId,
-        })
-      });
 
-      const json = await response.json();
-
-      if (!response.ok) {
-        console.error('Resposta não ok:', json);
-        throw new Error('Erro ao cadastrar observação');
-      }
-
-      if (json && json.observacoesId) { 
-        Alert.alert("Sucesso", "Observação cadastrada com sucesso!");
-        setDescricao("");
-        setLocal("");
-        setData(new Date());
-        setErro(false);
-        carregarObservacoes(objetoId);
-      } else {
-        console.error('JSON inesperado:', json);
-        throw new Error('Erro ao cadastrar observação');
-      }
-    } catch (error) {
-      console.error('Erro no catch:', error);
-      setErro(true);
-      Alert.alert("Erro", "Ocorreu um erro ao cadastrar a observação. Tente novamente.");
-    }
+  function limparCampos() {
+    setObservacaoDescricao('');
+    setObservacaoLocal('');
+    setObservacaoData('');
+    setAnimalId('');
+    setUsuarioId('');
   }
 
   return (
-    <ScrollView contentContainerStyle={styles.forms}>
-      <View style={styles.container}>
-        <FlatList
-          data={observacoes}
-          keyExtractor={(item) => item.observacoesId.toString()}
-          renderItem={({ item }) => (
-            <View style={styles.itemContainer}>
-              <Text style={styles.itemText}>Descrição: {item.ObservacoesDescricao}</Text>
-              <Text style={styles.itemText}>Local: {item.ObservacoesLocal}</Text>
-              <Text style={styles.itemText}>Data: {item.ObservacoesData}</Text>
-            </View>
-          )}
+    <View style={styles.container}>
+      <StatusBar />
+      <View style={styles.box}>
+        <Text style={styles.label}>Descrição:</Text>
+        <TextInput
+          style={styles.input}
+          onChangeText={text => setObservacaoDescricao(text)}
+          value={observacaoDescricao}
+          placeholder="Descreva a observação"
         />
-        <View style={styles.inputContainer}>
-          <TextInput
-            style={styles.input}
-            onChangeText={setDescricao}
-            value={descricao}
-            placeholder="Descrição"
-            placeholderTextColor='white'
-          />
-        </View>
-        <View style={styles.inputContainer}>
-          <TextInput
-            style={styles.input}
-            onChangeText={setLocal}
-            value={local}
-            placeholder="Local"
-            placeholderTextColor='white'
-          />
-        </View>
-        <TouchableOpacity style={styles.datePickerButton} onPress={() => setShowDatePicker(true)}>
-          <Text style={styles.datePickerText}>Selecionar Data e Hora</Text>
+        <Text style={styles.label}>Local:</Text>
+        <TextInput
+          style={styles.input}
+          onChangeText={text => setObservacaoLocal(text)}
+          value={observacaoLocal}
+          placeholder="Informe o local da observação"
+        />
+        <Text style={styles.label}>Data (dd/mm/yyyy):</Text>
+        <TextInput
+          style={styles.input}
+          onChangeText={text => setObservacaoData(text)}
+          value={observacaoData}
+          placeholder="Informe a data da observação"
+        />
+        <Text style={styles.label}>ID do Animal:</Text>
+        <TextInput
+          style={styles.input}
+          onChangeText={text => setAnimalId(text)}
+          value={animalId}
+          placeholder="Informe o ID do animal"
+        />
+        <Text style={styles.label}>ID do Usuário:</Text>
+        <TextInput
+          style={styles.input}
+          onChangeText={text => setUsuarioId(text)}
+          value={usuarioId}
+          placeholder="Informe o ID do usuário"
+        />
+        <TouchableOpacity style={styles.buttonContainer} onPress={handleSubmit}>
+          <Text style={styles.buttonText}>Salvar Observação</Text>
         </TouchableOpacity>
-        {showDatePicker && (
-          <DateTimePicker
-            value={data}
-            mode="datetime"
-            display="spinner"
-            onChange={(event, selectedDate) => {
-              setShowDatePicker(false);
-              if (selectedDate) {
-                setData(selectedDate);
-              }
-            }}
-          />
-        )}
-        <TouchableOpacity style={styles.cadastro} onPress={cadastrarObservacao}>
-          <Text style={styles.cadastroText}>Cadastrar Observação</Text>
+        <TouchableOpacity style={styles.buttonContainer} onPress={() => handle2(false)}>
+          <Text style={styles.buttonText}>Cancelar</Text>
         </TouchableOpacity>
-        {erro && <Text style={styles.errorText}>Revise cuidadosamente todos os campos</Text>}
       </View>
-    </ScrollView>
+    </View>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
-    flex: 1,
-    paddingHorizontal: '5%',
-    marginTop: 35,
-    marginBottom: 20,
-    display: "flex",
-    flexDirection: "column",
-    justifyContent: "center",
-    alignItems: "center",
-    backgroundColor: "black",
-    opacity: 0.94,
+    backgroundColor: "red",
+    borderRadius: 10,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.25,
+    shadowRadius: 3.84,
+    elevation: 5,
+    height: "100%",
+    width: "100%",
+    position: "absolute"
   },
-  itemContainer: {
-    marginBottom: 10,
-  },
-  itemText: {
-    color: "white",
-    fontSize: 16,
-  },
-  inputContainer: {
+  box: {
     width: '100%',
-    marginBottom: 20,
+    height: '100%',
+    marginTop: 130,
+    alignItems: 'center',
+    backgroundColor: "white",
+     position: "absolute"
+  },
+  label: {
+    fontSize: 16,
+    color: "red"
   },
   input: {
-    width: '100%',
-    height: 60,
+    width: '90%',
+    height: 40,
+    borderWidth: 1,
+    borderColor: '#ccc',
+    borderRadius: 5,
     padding: 10,
-    borderRadius: 3,
-    backgroundColor: "#595959",
-    color: "white"
-  },
-  datePickerButton: {
-    backgroundColor: "#4BBEE7",
-    width: "100%",
-    padding: 15,
-    paddingVertical: 20,
-    borderRadius: 5,
-    marginTop: 10,
-    alignItems: "center",
-    justifyContent: "center",
-  },
-  datePickerText: {
-    color: 'white',
-    fontSize: 16,
-  },
-  cadastro: {
-    backgroundColor: "#4BBEE7",
-    color: "white",
-    width: "100%",
-    padding: 15,
-    borderRadius: 5,
-    marginTop: 15,
-    height: 60,
-    display: "flex",
-    margin: 'auto',
-    textAlign: "center",
-    alignItems: "center",
-    justifyContent: "center",
-  },
-  cadastroText: {
-    color: 'white',
-    fontSize: 16,
-  },
-  errorText: {
-    color: 'red',
-    fontSize: 18,
-    marginTop: 20,
     marginBottom: 20,
-    textAlign: "center"
-  }
+  },
+  buttonContainer: {
+    backgroundColor: 'blue',
+    borderRadius: 5,
+    paddingVertical: 12,
+    marginTop: 10,
+    height: 50,
+    width: '90%',
+  },
+  buttonText: {
+    color: '#fff',
+    fontSize: 16,
+    textAlign: 'center',
+  },
 });

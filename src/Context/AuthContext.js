@@ -1,5 +1,6 @@
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { createContext, useState } from "react";
+import Observacao from "../Pages/Observacoes";
 
 export const AuthContext = createContext();
 
@@ -10,7 +11,10 @@ export default function AuthProvider({ children }) {
 
   const [cadastro, setCadastro] = useState(false);
   const [error, setError] = useState(false);
-  const [showCadastro, setShowCadastro] = useState(false);
+  const [showCadastro, setShowCadastro] = useState(false);7
+
+
+  const[ exibirobservacao, setExibirObservacao] = useState(false)
 
   async function Login(email, senha) {
     await fetch('http://10.139.75.33:5251/api/Usuario/Login', {
@@ -54,6 +58,11 @@ export default function AuthProvider({ children }) {
         setShowCadastro(!showCadastro)
     }
 
+    function toggleObs()
+    {
+               setExibirObservacao(true)
+    }
+
   async function RealizaCadastro(nome, telefone, email, senha) {
      await fetch('http://10.139.75.33:5251/api/Usuario/CreateUsuario', {
         method: 'POST',
@@ -93,6 +102,8 @@ export default function AuthProvider({ children }) {
             toggleScreen,
             sucessCadastro,
             sucessLogin,
+            Observacao: exibirobservacao, setExibirObservacao,
+            toggleObs
             }}>
         {children}
         </AuthContext.Provider>
