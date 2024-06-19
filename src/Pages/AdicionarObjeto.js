@@ -41,7 +41,7 @@ export default function AdicionarObjeto() {
       const formattedDesaparecimento = format(desaparecimento, "yyyy-MM-dd'T'HH:mm:ss");
       const formattedEncontro = format(encontro, "yyyy-MM-dd'T'HH:mm:ss");
 
-      const response = await fetch('http://192.168.10.5/api/Objeto/CreateObjeto', {
+      const response = await fetch('http://10.139.75.33:5251/api/Objeto/CreateObjeto', {
         method: "POST",
         headers: {
           'Content-Type': 'application/json'

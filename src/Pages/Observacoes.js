@@ -1,76 +1,110 @@
 import { StatusBar } from 'expo-status-bar';
-import React, { useState } from 'react';
-import { View, Text, TextInput, TouchableOpacity, StyleSheet, Alert } from 'react-native';
-import DateTimePicker from '@react-native-community/datetimepicker';
+import React, { useContext, useState, useEffect } from 'react';
+import { View, Text, TextInput, TouchableOpacity, StyleSheet, Alert,  } from 'react-native';
+import { AuthContext } from '../Context/AuthContext';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
-export default function Observacao({ handle2, item }) {
+export default function Observacao({ handle2, objeto2, objetoId }) {
   const [observacaoDescricao, setObservacaoDescricao] = useState('');
   const [observacaoLocal, setObservacaoLocal] = useState('');
-  const [observacaoData, setObservacaoData] = useState(new Date());
-  const [objetoId, setObjetoId] = useState('');
-  const [usuarioId, setUsuarioId] = useState('');
+  const [observacaoData, setObservacaoData] = useState('');
+  const [animalId, setAnimalId] = useState('');
   const [sucesso, setSucesso] = useState(false);
   const [erro, setErro] = useState(false);
-  const [showObservacaoPicker, setShowObservacaoPicker] = useState(false);
+  const [userId, setUserId] = useState("")
+
+  const {usuarioId, usuarioNome} = useContext(AuthContext);
+
+  useEffect(() => {
+    const getUserId = async () => {
+      try {
+        const storedUserId = await AsyncStorage.getItem('userId');
+        if (storedUserId) {
+          setUserId(storedUserId);
+        } else {
+          Alert.alert("Erro", "ID do usuário não encontrado");
+        }
+      } catch (error) {
+        console.error(error);
+      }
+    };
+    getUserId();
+  }, []);
 
   async function handleSubmit() {
-    if (!observacaoDescricao || !observacaoLocal || !observacaoData || !objetoId || !usuarioId) {
-      Alert.alert('Erro', 'Por favor, preencha todos os campos.');
-      setErro(true);
-      return;
-    }
-
-    const dataFormatada = observacaoData.toISOString();
-    const storedUserId = await AsyncStorage.getItem('userId');
-    const storedObjetoId = await AsyncStorage.getItem('objetoId');
-
-    await fetch('http://10.139.75.33:5251/api/Observacoes/CreateObservacao', {
-      method: "POST",
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        observacaoDescricao: observacaoDescricao,
-        observacaoLocal: observacaoLocal,
-        observacaoData: dataFormatada, 
-        objetoId: objetoId,
-        usuarioId: storedUserId,
-        objetoId: item.objetoId,
-      })
-    })
-    .then(res => res.json())
-    .then(data => {
-      if (data) {
+    const dataFormatada = formatarData(observacaoData);
+    
+    try {
+      const response = await fetch('http://10.139.75.33:5251/api/Observacoes/CreateObservacoes', {
+        method: "POST",
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          observacoesDescricao: observacaoDescricao,
+          observacoesLocal: observacaoLocal,
+          observacoesData: dataFormatada, 
+          objetoId: objeto2.objetoId,
+          usuarioId: userId
+        })
+      });
+  
+      const data = await response.json();
+  
+      if (response.ok) {
         console.log('Nova observação:', data);
         setSucesso(true);
         handle2(false);
         limparCampos();
         Alert.alert('Sucesso', 'Observação cadastrada com sucesso!');
       } else {
+        console.error('Erro no servidor:', data);
         setErro(true);
         Alert.alert('Erro', 'Falha ao cadastrar observação.');
       }
-    })
-    .catch(err => {
-      console.error('Erro:', err);
+    } catch (error) {
+      console.error('Erro ao fazer requisição:', error);
       setErro(true);
-    });
+      Alert.alert('Erro', 'Falha ao cadastrar observação.');
+    }
+  }
+
+  function formatarData(data) {
+    const partes = data.split('/');
+    if (partes.length === 3) {
+      const dia = partes[0];
+      const mes = partes[1];
+      const ano = partes[2];
+      return `${ano}-${mes}-${dia}`;
+    }
+    return data;
   }
 
   function limparCampos() {
     setObservacaoDescricao('');
     setObservacaoLocal('');
-    setObservacaoData(new Date());
-    setObjetoId('');
-    setUsuarioId('');
+    setObservacaoData('');
+    setAnimalId('');
   }
 
   return (
     <View style={styles.container}>
       <StatusBar />
       <View style={styles.box}>
-        <Text style={styles.observar}>Observação</Text>
+        {/* <TextInput
+          style={styles.input}
+          onChangeText={text => setObservacaoDescricao(text)}
+          value={observacaoDescricao}
+          placeholder="Descreva a observação"
+        />
+        <Text style={styles.label}>Local:</Text>
+        <TextInput
+          style={styles.input}
+          onChangeText={text => setObservacaoLocal(text)}
+          value={observacaoLocal}
+          placeholder="Informe o local da observação"
+        /> */}
+        <Text style={styles.observar}>Observação: {objeto2.objetoNome}</Text>
         <TextInput
           style={styles.input}
           onChangeText={text => setObservacaoDescricao(text)}
@@ -85,28 +119,12 @@ export default function Observacao({ handle2, item }) {
           placeholder="Informe o local da observação"
           placeholderTextColor="white"
         />
-        <TouchableOpacity
-          style={styles.datePickerButton}
-          onPress={() => setShowObservacaoPicker(true)}
-        >
-          <Text style={styles.datePickerText}>
-            {observacaoData ? observacaoData.toLocaleDateString() : 'Selecionar Data e Hora da Observação'}
-          </Text>
-        </TouchableOpacity>
-        {showObservacaoPicker && (
-          <DateTimePicker
-          style={styles.date}
-            value={observacaoData}
-            mode="datetime"
-            display="default"
-            onChange={(event, selectedDate) => {
-              setShowObservacaoPicker(false);
-              if (selectedDate) {
-                setObservacaoData(selectedDate);
-              }
-            }}
-          />
-        )}
+        <TextInput
+          style={styles.input}
+          onChangeText={text => setObservacaoData(text)}
+          value={observacaoData}
+          placeholder="dd/mm/yyyy"
+        />
         <TouchableOpacity style={styles.buttonContainer} onPress={handleSubmit}>
           <Text style={styles.buttonText}>Salvar Observação</Text>
         </TouchableOpacity>
@@ -136,7 +154,7 @@ const styles = StyleSheet.create({
     marginTop: 120,
     alignItems: 'center',
     backgroundColor: "#161616",
-     position: "absolute"
+    position: "absolute"
   },
   date: {
     marginTop: 55

@@ -1,14 +1,15 @@
-import React from 'react';
-import { useEffect, useState, useRef, useContext } from 'react';
-import { View, Text, StyleSheet, Image, TouchableOpacity, Animated } from 'react-native';
+import React, { useState, useRef, useEffect } from 'react';
+import { View, Text, StyleSheet, Image, TouchableOpacity, Animated, Alert } from 'react-native';
 import { useFocusEffect } from '@react-navigation/native';
 import Observacao from './Observacoes';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import { set } from 'date-fns';
 
-export default function Animais({ handle, objeto, handle2 }) {
-
+export default function Detalhes({ handle, objeto, handle2 }) {
   const fade = useRef(new Animated.Value(0)).current;
-
   const [criaobs, setCriaObs] = useState(false);
+  const [objetoId, setObjetoId] = useState('');
+  const [objeto2, setObjeto2] = useState("")
 
   useFocusEffect(
     React.useCallback(() => {
@@ -20,13 +21,16 @@ export default function Animais({ handle, objeto, handle2 }) {
       }).start()
     }, [])
   );
-  function criarobservação() {
+
+
+  function criarobservacao(item) {
     setCriaObs(true)
+    setObjeto2(item)
   }
 
   return (
     <Animated.View style={{ opacity: fade, backgroundColor: "#000" }}>
-      {criaobs == false ?
+      {!criaobs ?
         <View style={styles.container}>
           <View style={styles.productInfo}>
             <Text style={styles.title}>Nome: {objeto.objetoNome}</Text>
@@ -42,17 +46,19 @@ export default function Animais({ handle, objeto, handle2 }) {
             <TouchableOpacity style={styles.buttonContainer} onPress={() => handle(false)}>
               <Text style={styles.buttonText}>Voltar</Text>
             </TouchableOpacity>
-            <TouchableOpacity style={styles.buttonContainer} onPress={criarobservação}>
+            <TouchableOpacity style={styles.buttonContainer} onPress={() => criarobservacao(objeto)}>
               <Text style={styles.buttonText}>Criar observação</Text>
             </TouchableOpacity>
           </View>
         </View>
         :
-        <Observacao handle2={setCriaObs} />
+        <Observacao handle2={setCriaObs} objeto2={objeto2}/>
       }
     </Animated.View>
   );
 }
+
+
 
 const styles = StyleSheet.create({
   container: {
@@ -104,7 +110,6 @@ const styles = StyleSheet.create({
     borderRadius: 5,
     paddingVertical: 12,
     marginTop: 10,
-
   },
   buttonText: {
     color: '#fff',

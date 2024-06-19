@@ -50,6 +50,7 @@ export default function AuthProvider({ children }) {
             setError(true);
         }
     })
+    
     .catch((err) => setError(true));
 }
 
