@@ -1,25 +1,29 @@
 import { StatusBar } from 'expo-status-bar';
 import React, { useState } from 'react';
 import { View, Text, TextInput, TouchableOpacity, StyleSheet, Alert } from 'react-native';
+import DateTimePicker from '@react-native-community/datetimepicker';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 export default function Observacao({ handle2, item }) {
   const [observacaoDescricao, setObservacaoDescricao] = useState('');
   const [observacaoLocal, setObservacaoLocal] = useState('');
-  const [observacaoData, setObservacaoData] = useState('');
-  const [animalId, setAnimalId] = useState('');
+  const [observacaoData, setObservacaoData] = useState(new Date());
+  const [objetoId, setObjetoId] = useState('');
   const [usuarioId, setUsuarioId] = useState('');
   const [sucesso, setSucesso] = useState(false);
   const [erro, setErro] = useState(false);
+  const [showObservacaoPicker, setShowObservacaoPicker] = useState(false);
 
   async function handleSubmit() {
-    if (!observacaoDescricao || !observacaoLocal || !observacaoData || !animalId || !usuarioId) {
+    if (!observacaoDescricao || !observacaoLocal || !observacaoData || !objetoId || !usuarioId) {
       Alert.alert('Erro', 'Por favor, preencha todos os campos.');
       setErro(true);
       return;
     }
 
-    // Formatar a data para o formato esperado pela API (yyyy-MM-dd)
-    const dataFormatada = formatarData(observacaoData);
+    const dataFormatada = observacaoData.toISOString();
+    const storedUserId = await AsyncStorage.getItem('userId');
+    const storedObjetoId = await AsyncStorage.getItem('objetoId');
 
     await fetch('http://10.139.75.33:5251/api/Observacoes/CreateObservacao', {
       method: "POST",
@@ -31,7 +35,8 @@ export default function Observacao({ handle2, item }) {
         observacaoLocal: observacaoLocal,
         observacaoData: dataFormatada, 
         objetoId: objetoId,
-        usuarioId: usuarioId
+        usuarioId: storedUserId,
+        objetoId: item.objetoId,
       })
     })
     .then(res => res.json())
@@ -53,13 +58,11 @@ export default function Observacao({ handle2, item }) {
     });
   }
 
-
-
   function limparCampos() {
     setObservacaoDescricao('');
     setObservacaoLocal('');
-    setObservacaoData('');
-    setAnimalId('');
+    setObservacaoData(new Date());
+    setObjetoId('');
     setUsuarioId('');
   }
 
@@ -67,41 +70,43 @@ export default function Observacao({ handle2, item }) {
     <View style={styles.container}>
       <StatusBar />
       <View style={styles.box}>
-        <Text style={styles.label}>Descrição:</Text>
+        <Text style={styles.observar}>Observação</Text>
         <TextInput
           style={styles.input}
           onChangeText={text => setObservacaoDescricao(text)}
           value={observacaoDescricao}
           placeholder="Descreva a observação"
+          placeholderTextColor="white"
         />
-        <Text style={styles.label}>Local:</Text>
         <TextInput
           style={styles.input}
           onChangeText={text => setObservacaoLocal(text)}
           value={observacaoLocal}
           placeholder="Informe o local da observação"
+          placeholderTextColor="white"
         />
-        <Text style={styles.label}>Data (dd/mm/yyyy):</Text>
-        <TextInput
-          style={styles.input}
-          onChangeText={text => setObservacaoData(text)}
-          value={observacaoData}
-          placeholder="Informe a data da observação"
-        />
-        <Text style={styles.label}>ID do Animal:</Text>
-        <TextInput
-          style={styles.input}
-          onChangeText={text => setAnimalId(text)}
-          value={animalId}
-          placeholder="Informe o ID do animal"
-        />
-        <Text style={styles.label}>ID do Usuário:</Text>
-        <TextInput
-          style={styles.input}
-          onChangeText={text => setUsuarioId(text)}
-          value={usuarioId}
-          placeholder="Informe o ID do usuário"
-        />
+        <TouchableOpacity
+          style={styles.datePickerButton}
+          onPress={() => setShowObservacaoPicker(true)}
+        >
+          <Text style={styles.datePickerText}>
+            {observacaoData ? observacaoData.toLocaleDateString() : 'Selecionar Data e Hora da Observação'}
+          </Text>
+        </TouchableOpacity>
+        {showObservacaoPicker && (
+          <DateTimePicker
+          style={styles.date}
+            value={observacaoData}
+            mode="datetime"
+            display="default"
+            onChange={(event, selectedDate) => {
+              setShowObservacaoPicker(false);
+              if (selectedDate) {
+                setObservacaoData(selectedDate);
+              }
+            }}
+          />
+        )}
         <TouchableOpacity style={styles.buttonContainer} onPress={handleSubmit}>
           <Text style={styles.buttonText}>Salvar Observação</Text>
         </TouchableOpacity>
@@ -115,7 +120,7 @@ export default function Observacao({ handle2, item }) {
 
 const styles = StyleSheet.create({
   container: {
-    backgroundColor: "red",
+    backgroundColor: "#161616",
     borderRadius: 10,
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 2 },
@@ -124,31 +129,54 @@ const styles = StyleSheet.create({
     elevation: 5,
     height: "100%",
     width: "100%",
-    position: "absolute"
   },
   box: {
     width: '100%',
     height: '100%',
-    marginTop: 130,
+    marginTop: 120,
     alignItems: 'center',
-    backgroundColor: "white",
+    backgroundColor: "#161616",
      position: "absolute"
+  },
+  date: {
+    marginTop: 55
   },
   label: {
     fontSize: 16,
-    color: "red"
+    color: "white"
+  },
+  observar: {
+    fontSize: 22,
+    color: "white",
+    marginBottom: 10
   },
   input: {
     width: '90%',
-    height: 40,
-    borderWidth: 1,
-    borderColor: '#ccc',
-    borderRadius: 5,
+    height: 70,
     padding: 10,
-    marginBottom: 20,
+    borderRadius: 5,
+    backgroundColor: "#595959",
+    color: "white",
+    marginTop: 10,
+    marginBottom: 10,
+    justifyContent: 'center',
+  },
+  datePickerButton: {
+    backgroundColor: "#4BBEE7",
+    width: "90%",
+    padding: 15,
+    paddingVertical: 20,
+    borderRadius: 5,
+    marginTop: 10,
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  datePickerText: {
+    color: 'white',
+    fontSize: 16,
   },
   buttonContainer: {
-    backgroundColor: 'blue',
+    backgroundColor: '#4BBEE7',
     borderRadius: 5,
     paddingVertical: 12,
     marginTop: 10,

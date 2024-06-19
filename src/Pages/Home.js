@@ -1,6 +1,7 @@
-import { View, Text, StyleSheet, ActivityIndicator, FlatList, Animated, TouchableOpacity } from 'react-native';
+import { View, Text, StyleSheet, Alert, ActivityIndicator, FlatList, Animated, TouchableOpacity } from 'react-native';
 import React, { useEffect, useState, useRef, useContext } from 'react';
 import { useFocusEffect } from '@react-navigation/native';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 import Objetos from './Objetos';
 import { AuthContext } from '../Context/AuthContext';
@@ -11,10 +12,12 @@ export default function Home() {
   const [objetos, setObjetos] = useState([]);
   const [error, setError] = useState(false);
   const fade = useRef(new Animated.Value(0)).current;
+  const [nameId, setNameId] = useState(null);
 
   const [exibirobservacao, setExibirObservacao] = useState(false)
   const [exibirObjetos, setExibirObjetos] = useState(false)
   const[ exibirDetalhes, setExibirDetalhes] = useState(false)
+
 
   const [ objeto, setObjeto] = useState()
 
@@ -57,7 +60,7 @@ export default function Home() {
 
 
   return (
-    <Animated.View style={{ opacity: fade }}>
+    <Animated.View style={{ opacity: fade}}>
       {!exibirDetalhes ? 
       <View style={styles.container}>
         <View style={styles.containerProducts}>
@@ -102,7 +105,7 @@ export default function Home() {
 const styles = StyleSheet.create({
   container: {
     backgroundColor: "#161616",
-    // height: "100%",
+    height: "100%",
     alignItems: "center",
     justifyContent: "center",
   },
@@ -144,7 +147,6 @@ const styles = StyleSheet.create({
     display: "flex",
     flexDirection: "column",
     justifyContent: "center",
-    marginBottom: 50,
     // marginTop: -10
   }
 });

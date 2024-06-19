@@ -15,7 +15,7 @@ export default function Animais({ handle, objeto, handle2 }) {
       fade.setValue(0);
       Animated.timing(fade, {
         toValue: 1,
-        duration: 2000,
+        duration: 1000,
         useNativeDriver: true
       }).start()
     }, [])
